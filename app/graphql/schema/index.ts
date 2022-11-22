@@ -17,6 +17,13 @@ type User {
   booksOwned: [Book!]
 }
 
+
+type AuthData {
+  userId: ID!
+  token: String!
+  tokenExpiration: Int!
+}
+
 input BookInput {
     title: String!
     description: String!
@@ -31,7 +38,7 @@ input UserInput {
 
 type RootQuery {
     books: [Book!]!
-    users: [User]
+    login(email: String!, password: String!): AuthData!
 }
 type RootMutation {
      createBook(bookInput: BookInput): Book

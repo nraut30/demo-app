@@ -1,6 +1,7 @@
 import Book from "../../model/book"
 import User from "../../model/user"
 import bcrypt from "bcryptjs";
+import jwt from 'jsonwebtoken';
 
 const user = async (userId: any): Promise<any> => {
     try {
@@ -92,6 +93,24 @@ const graphQLResolver = {
             console.log(err)
             throw err
         }
+    },
+    login: async ({ email, password }: { email: String, password: any }) => {
+        const user = await User.findOne({ email: email });
+        if (!user) {
+            throw new Error('User does not exist!');
+        }
+        const isEqual = await bcrypt.compare(password, user.password);
+        if (!isEqual) {
+            throw new Error('Password is incorrect!');
+        }
+        const token = jwt.sign(
+            { userId: user.id, email: user.email },
+            'somesupersecretkey',
+            {
+                expiresIn: '1h'
+            }
+        );
+        return { userId: user.id, token: token, tokenExpiration: 1 };
     }
 }
 
