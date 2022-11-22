@@ -1,0 +1,47 @@
+.main-navigation {
+    position: fixed;
+    left:0;
+    top: 0;
+    width:100%;
+    height: 3.5rem;
+    background-color: rgb(255, 85, 0);
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.main-navigation_logo h1 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.main-navigation_items {
+    margin: 0 1.5rem;
+}
+
+.main-navigation_items ul{
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.main-navigation_items li{
+    margin: 0 1rem;
+}
+
+.main-navigation_items a{ 
+    text-decoration: none;
+    color: #fff;
+}
+
+.main-navigation_items a:hover,
+.main-navigation_items a:active{
+    color: rgb(233, 237, 116);
+}
+
+.main-navigation_items a.active {
+    color: rgb(214, 218, 30);
+
+}
