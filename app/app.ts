@@ -1,77 +1,19 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import { graphqlHTTP } from 'express-graphql'
-import { buildSchema } from 'graphql'
 import mongoose from 'mongoose'
+import graphQLSchema from './graphql/schema'
+import graphQLResolver from './graphql/resolvers'
 
 const app = express()
-
-import Book from "./model/book"
 
 app.use(bodyParser.json())
 
 app.use(
   '/graphql',
   graphqlHTTP({
-    schema: buildSchema(`
-    type Book {
-        _id: ID!
-        title: String!
-        description: String!
-        price: Float!
-        date: String!
-    }
-
-    input BookInput {
-        title: String!
-        description: String!
-        price: Float!
-        date: String!
-    }
-
-    type RootQuery {
-        books: [Book!]!
-    }
-    type RootMutation {
-         createBook(bookInput: BookInput):Book
-    } 
-    schema {
-        query: RootQuery
-        mutation: RootMutation
-    }
-    `),
-    rootValue: {
-      books: () => {
-        return Book.find()
-          .then((books: any) => {
-            return books.map((book: any) => {
-              return { ...book._doc, _id: book.id }
-            })
-          })
-          .catch((err: Error) => {
-            console.log(err, ' error')
-            throw err
-          })
-      },
-      createBook: (args: any) => {
-        const book = new Book({
-          title: args.bookInput.title,
-          description: args.bookInput.description,
-          price: +args.bookInput.price,
-          date: new Date(args.bookInput.date)
-        })
-        book
-          .save()
-          .then((result: any) => {
-            return { ...result._doc }
-          })
-          .catch((err: Error) => {
-            console.log(err)
-            throw err
-          })
-        return book
-      }
-    },
+    schema: graphQLSchema,
+    rootValue: graphQLResolver,
     graphiql: true
   })
 )

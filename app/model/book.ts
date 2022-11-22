@@ -18,6 +18,10 @@ const bookSchema = new Schema({
   date: {
     type: Date,
     required: true
+  },
+  owner: {
+    type: Schema.Types.ObjectId,
+    required: true,
   }
 })
 
