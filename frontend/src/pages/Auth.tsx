@@ -26,40 +26,29 @@ const loginMachine = createMachine(
     id: "login",
     initial: "collectingFormData",
     context: {
-      email: "",
-      accesstoken: "",
-      expiresIn: "",
+      userId: "",
+      token: "",
+      tokenExpiration: "",
     },
     states: {
       collectingFormData: {
         on: {
           submit: {
-            target: "submitting",
-          },
-        },
-      },
-      submitting: {
-        invoke: {
-          id: "submitting",
-          src: "submitting",
-          onDone: {
-            actions: "savedata",
-          },
-          onError: {
-            actions: "showError",
+            actions: ["savedata"],
           },
         },
       },
     },
   },
   {
-    services: {
-      submitting: (ctx: any) => {
-        return submitUser(ctx);
-      },
-    },
     actions: {
-      savedata: () => console.log(),
+      savedata: assign((_, evnt: any) => {
+        return {
+          userId: evnt.resData.data.login.userId,
+          token: evnt.resData.data.login.token,
+          tokenExpiration: evnt.resData.data.login.tokenExpiration,
+        };
+      }),
     },
   }
 );
@@ -68,6 +57,7 @@ const submitUser = async (args: {
   email: string;
   password: string;
   signin: boolean;
+  send: CallableFunction;
 }) => {
   let reqBody;
   if (!args.signin) {
@@ -98,26 +88,26 @@ const submitUser = async (args: {
       }`,
     };
   }
-  fetch("http://localhost:3000/graphql", {
-    method: "POST",
-    body: JSON.stringify(reqBody),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((res) => {
-      if (res.status !== 200 && res.status !== 201) {
-        throw new Error("Failed.");
-      } else {
-        return res.json();
-      }
+  if (reqBody) {
+    fetch("http://localhost:3000/graphql", {
+      method: "POST",
+      body: JSON.stringify(reqBody),
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
-    .then((resData) => {
-      if (args.signin) {
-      }
-      console.log(resData, " resData");
-    })
-    .catch((err) => console.log(err, " error"));
+      .then((res) => {
+        if (res.status !== 200 && res.status !== 201) {
+          throw new Error("Failed.");
+        } else {
+          return res.json();
+        }
+      })
+      .then((resData) => {
+        if (resData.data.login) args.send("submit", { resData });
+      })
+      .catch((err) => console.log(err, " error"));
+  }
 };
 
 const Auth = () => {
@@ -139,16 +129,18 @@ const Auth = () => {
       <form
         onSubmit={form.handleSubmit((values) => {
           if (currentTab.matches("signup")) {
-            sendStat("submitting", {
+            submitUser({
               email: values.email,
               password: values.password,
               signin: false,
+              send: sendStat,
             });
           } else if (currentTab.matches("signin")) {
-            sendStat("submitting", {
+            submitUser({
               email: values.email,
               password: values.password,
               signin: true,
+              send: sendStat,
             });
           }
         })}
