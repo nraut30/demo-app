@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 const user = async (userId: any): Promise<any> => {
     try {
         const user: any = await User.findById(userId)
-        return { ...user._doc, _id: user.id, booksOwned: books.bind(this, user._doc.booksOwned) }
+        return { ...user._doc, _id: user.id, booksOwned: books.bind(this, ...user._doc.booksOwned) }
     } catch (err) {
         console.log(err, " Error");
         throw err;
@@ -16,6 +16,11 @@ const user = async (userId: any): Promise<any> => {
 const books = async (booksId: any): Promise<any> => {
     try {
         const books = await Book.find({ _id: { $in: booksId } })
+        books.sort((a, b) => {
+            return (
+                booksId.indexOf(a._id.toString()) - booksId.indexOf(b._id.toString())
+            );
+        });
         return books.map((book: any) => {
             return {
                 ...book._doc,
@@ -31,7 +36,10 @@ const books = async (booksId: any): Promise<any> => {
 }
 
 const graphQLResolver = {
-    books: async () => {
+    books: async (args: any, req: any) => {
+        if (!req.isAuth) {
+            throw new Error('Unauthenticated!');
+        }
         try {
             const books: any = await Book.find()
             return books.map((book: any) => {
@@ -48,14 +56,19 @@ const graphQLResolver = {
             throw err
         }
     },
-    createBook: async (args: any) => {
+    createBook: async (args: any, req: any) => {
+        console.log(req.userId, req.isAuth, " reqqq");
+
+        if (!req.isAuth) {
+            throw new Error('Unauthenticated!');
+        }
         try {
             const book: any = new Book({
                 title: args.bookInput.title,
                 description: args.bookInput.description,
                 price: +args.bookInput.price,
                 date: new Date(args.bookInput.date),
-                owner: '637c644b77fcca15809becb9'
+                owner: req.userId
             })
             let createdBook: any;
             const result: any = await book.save();
@@ -64,7 +77,7 @@ const graphQLResolver = {
                 _id: result._doc._id.toString(),
                 owner: user.bind(this, result._doc.owner)
             }
-            const userFounded = await User.findById('637c644b77fcca15809becb9')
+            const userFounded = await User.findById(req.userId)
             if (!userFounded) {
                 throw new Error("User Doesn't Exist...")
             }

@@ -4,10 +4,13 @@ import { graphqlHTTP } from 'express-graphql'
 import mongoose from 'mongoose'
 import graphQLSchema from './graphql/schema'
 import graphQLResolver from './graphql/resolvers'
+import isAuth from "./middleware/is-auth";
 
 const app = express()
 
 app.use(bodyParser.json())
+
+app.use(isAuth);
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");

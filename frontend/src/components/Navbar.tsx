@@ -3,10 +3,20 @@ import { NavLink } from "react-router-dom";
 import "./Navbar.css";
 
 type NavbarProps = {
-  showBooks: Boolean;
+  contxt: {
+    userId: String;
+    token: String;
+    tokenExpiration: String;
+    books: Array<any>;
+    showBooks: boolean;
+    logoutUser: boolean;
+  };
+  logout: CallableFunction;
 };
 
-const Navbar: FC<NavbarProps> = ({ showBooks }) => {
+const Navbar: FC<NavbarProps> = ({ contxt, logout }) => {
+  console.log(contxt, "navbar contxt");
+
   return (
     <header className="main-navigation">
       <div className="main-navigation_logo">
@@ -14,13 +24,22 @@ const Navbar: FC<NavbarProps> = ({ showBooks }) => {
       </div>
       <nav className="main-navigation_items">
         <ul>
-          <li>
-            <NavLink to="/"> Authenticate </NavLink>
-          </li>
-          {showBooks && (
+          {!contxt.showBooks && (
             <li>
-              <NavLink to="/books"> Books </NavLink>
+              <NavLink to="/"> Authenticate </NavLink>
             </li>
+          )}
+          {contxt.showBooks && (
+            <>
+              <li>
+                <NavLink to="/books"> Books </NavLink>
+              </li>
+              <li>
+                <button onClick={() => logout(true)} className="logoutBtn">
+                  Logout
+                </button>
+              </li>
+            </>
           )}
         </ul>
       </nav>

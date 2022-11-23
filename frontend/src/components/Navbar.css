@@ -9,6 +9,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    z-index: 15;
 }
 
 .main-navigation_logo h1 {
@@ -30,19 +31,34 @@
 
 .main-navigation_items li{
     margin: 0 1rem;
+    font-size: 18px;
 }
+
 
 .main-navigation_items a{ 
     text-decoration: none;
     color: #fff;
+    background-color: transparent;
+}
+
+.logoutBtn {
+    width: 60px;
+    height: 25px;
+    font-size: 18px;
+    padding: 0;
+    cursor: pointer;
+    background-color: transparent;
+    color: white;
+    border: none;
 }
 
 .main-navigation_items a:hover,
-.main-navigation_items a:active{
-    color: rgb(233, 237, 116);
+.main-navigation_items a:active, .logoutBtn:hover, .logoutBtn:active{
+    color: rgb(249, 251, 171);
+    outline: none;
 }
 
 .main-navigation_items a.active {
-    color: rgb(180, 238, 147);
+    color: rgb(175, 247, 211);
 
 }

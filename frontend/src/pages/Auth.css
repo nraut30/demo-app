@@ -11,7 +11,7 @@
     letter-spacing: 1px;
 }
 
-.form-control label, .form-control input {
+.form-control label, .form-control input, .form-control textarea {
     width: 100%;
     display: block;
 }

@@ -1,0 +1,34 @@
+.modal {
+    width: 40%;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.26);
+    position: fixed;
+    top: 20%;
+    left: 30%;
+    z-index: 11;
+}
+
+.modal_header {
+    padding: 1rem;
+    background-color: orange;
+    color: white;
+}
+
+.modal_section {
+    padding: 1rem;
+}
+
+.modal_actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn {
+    background-color: rgb(249, 109, 58);
+    color: white;
+    width: 80px;
+    height: 30px;
+    font-size: 15px;
+    padding: 0;
+    margin: 8px;
+}

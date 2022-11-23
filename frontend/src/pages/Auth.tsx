@@ -3,6 +3,7 @@ import "./Auth.css";
 import { createMachine, assign } from "xstate";
 import { useForm } from "react-hook-form";
 import { useMachine } from "@xstate/react";
+import { send } from "xstate/lib/actions";
 
 const toggleStateMachine = createMachine({
   id: "toggleStateMachine",
@@ -30,12 +31,19 @@ const loginMachine = createMachine(
       token: "",
       tokenExpiration: "",
       signupSuccess: false,
+      error: false,
     },
     states: {
       collectingFormData: {
         on: {
           submit: {
             actions: ["savedata"],
+          },
+          error: {
+            actions: ["error"],
+          },
+          reset: {
+            actions: ["reset"],
           },
         },
       },
@@ -58,6 +66,22 @@ const loginMachine = createMachine(
           };
         }
       }),
+      // reset: assign((_, evnt: any) => {
+      //   return {
+      //     userId: "",
+      //     token: "",
+      //     tokenExpiration: "",
+      //     signupSuccess: false,
+      //     error: false,
+      //   };
+      // }),
+      error: assign((_, evnt: any) => {
+        return {
+          ..._,
+          error: true,
+          signupSuccess: false,
+        };
+      }),
     },
   }
 );
@@ -67,7 +91,9 @@ const submitUser = async (args: {
   password: string;
   signin: boolean;
   send: CallableFunction;
+  form: any;
 }) => {
+  send("reset");
   let reqBody;
   if (!args.signin) {
     reqBody = {
@@ -113,13 +139,21 @@ const submitUser = async (args: {
         }
       })
       .then((resData) => {
-        if (resData.data.login) {
+        console.log(resData, " ressssDataaaa");
+
+        if (resData?.errors?.length) {
+          args.send("error");
+        } else if (resData.data.login) {
           args.send("submit", { resData });
-        } else {
+        } else if (resData.data.createUser) {
           args.send("submit", { signupSuccess: true });
         }
       })
-      .catch((err) => console.log(err, " error"));
+      .catch((err) => {
+        args.send("error");
+        console.error(err, " error");
+      });
+    args.form.reset();
   }
 };
 
@@ -137,6 +171,8 @@ const Auth: FC<AuthProps> = ({ context }) => {
 
   const [currentTab, sendTab] = useMachine(toggleStateMachine);
   const [currentStat, sendStat] = useMachine(loginMachine);
+
+  console.log(currentStat.context, " .,.,.,.,.,,.,.,.");
 
   useEffect(() => {
     if (
@@ -156,9 +192,11 @@ const Auth: FC<AuthProps> = ({ context }) => {
     if (currentStat.context.signupSuccess) {
       window.alert("Signup successful");
     } else if (currentStat.context.userId) {
-      window.alert("Signin succesful");
+      window.alert("Signin successful");
+    } else if (currentStat.context.error) {
+      window.alert("Error occurred");
     }
-  }, [currentStat.context.signupSuccess, currentStat.context.userId]);
+  }, [currentStat.context, currentStat.context]);
 
   return (
     <>
@@ -173,6 +211,7 @@ const Auth: FC<AuthProps> = ({ context }) => {
               password: values.password,
               signin: false,
               send: sendStat,
+              form: form,
             });
           } else if (currentTab.matches("signin")) {
             submitUser({
@@ -180,6 +219,7 @@ const Auth: FC<AuthProps> = ({ context }) => {
               password: values.password,
               signin: true,
               send: sendStat,
+              form: form,
             });
           }
         })}

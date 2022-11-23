@@ -1,0 +1,93 @@
+.books-control {
+    text-align: center;
+    border: 1px solid orangered;
+    padding :1rem;
+    /* margin: 0 auto auto auto; */
+    width: 30rem;
+    max-width: 80%;
+    position: absolute;
+    top: 100px;
+    left: 31vw;
+    z-index: 1;
+}
+
+.baseContainer {
+    position: absolute;
+    top: 250px;
+    left: 11vw;
+    z-index: 1;
+}
+
+.addBookBtn {
+    background-color: rgb(249, 109, 58);
+    color: white;
+    width: 80px;
+    height: 30px;
+    font-size: 15px;
+    padding: 0;
+}
+
+.hr {
+    width: 80vw;
+    margin: 10px;
+}
+
+.showBookBtn {
+    background-color: rgb(192, 89, 52);
+    color: white;
+    width: 100px;
+    height: 30px;
+    font-size: 15px;
+    padding: 0;
+}
+
+.book_wrapper {
+    width: 80vw;
+    height: 90px;
+    background-color: coral;
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 12px;
+    padding:10px;
+}
+
+.title_price_date {
+    height: 90px;
+    width: 33%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.fetchedDataText {
+    height: 30px;
+    font-size: 17px;
+    color: blue;
+    padding: 0.3rem;
+    margin: 0.3rem;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
+.hrInDetail {
+    width: 250px;
+    /* background-color: blue; */
+    border: 0.1px solid gray;
+}
+
+.description {
+    height: 90px;
+    width: 66%;
+    top:0;
+    position: relative;
+    overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.descriptiveText {
+    height: 40px;
+    width: 100%;
+}
