@@ -8,7 +8,7 @@ const user = async (userId: any): Promise<any> => {
         const user: any = await User.findById(userId)
         return { ...user._doc, _id: user.id, booksOwned: books.bind(this, ...user._doc.booksOwned) }
     } catch (err) {
-        console.log(err, " Error");
+        console.error(err, " Error");
         throw err;
     }
 }
@@ -30,7 +30,7 @@ const books = async (booksId: any): Promise<any> => {
             }
         })
     } catch (error) {
-        console.log(error, " Error");
+        console.error(error, " Error");
         throw error;
     }
 }
@@ -52,13 +52,11 @@ const graphQLResolver = {
             })
         }
         catch (err) {
-            console.log(err, ' error')
+            console.error(err, ' error')
             throw err
         }
     },
     createBook: async (args: any, req: any) => {
-        console.log(req.userId, req.isAuth, " reqqq");
-
         if (!req.isAuth) {
             throw new Error('Unauthenticated!');
         }
@@ -85,7 +83,7 @@ const graphQLResolver = {
             await userFounded.save();
             return createdBook;
         } catch (err) {
-            console.log(err)
+            console.error(err)
             throw err
         }
     },
@@ -103,7 +101,7 @@ const graphQLResolver = {
             const result: any = await user.save()
             return { ...result._doc, password: null, _id: result._id }
         } catch (err) {
-            console.log(err)
+            console.error(err)
             throw err
         }
     },

@@ -139,8 +139,6 @@ const submitUser = async (args: {
         }
       })
       .then((resData) => {
-        console.log(resData, " ressssDataaaa");
-
         if (resData?.errors?.length) {
           args.send("error");
         } else if (resData.data.login) {
@@ -171,8 +169,6 @@ const Auth: FC<AuthProps> = ({ context }) => {
 
   const [currentTab, sendTab] = useMachine(toggleStateMachine);
   const [currentStat, sendStat] = useMachine(loginMachine);
-
-  console.log(currentStat.context, " .,.,.,.,.,,.,.,.");
 
   useEffect(() => {
     if (

@@ -15,8 +15,6 @@ type NavbarProps = {
 };
 
 const Navbar: FC<NavbarProps> = ({ contxt, logout }) => {
-  console.log(contxt, "navbar contxt");
-
   return (
     <header className="main-navigation">
       <div className="main-navigation_logo">

@@ -83,8 +83,6 @@ const booksMachine =
           };
         }),
         showSuccess: assign((c, e) => {
-          console.log("sucessssssss");
-
           return {
             ...c,
             showSuccess: true,
@@ -193,7 +191,6 @@ const saveBookInDB = (data: any) => {
       }
     })
     .then((resData) => {
-      console.log(resData, " reDa111111");
       return resData;
     })
     .catch((err) => console.error(err, " error"));
@@ -205,7 +202,6 @@ type BookProps = {
 
 const Books: FC<BookProps> = ({ token }) => {
   const [current, send] = useMachine(booksMachine);
-  console.log(current.context, " current context");
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -263,7 +259,6 @@ const Books: FC<BookProps> = ({ token }) => {
 
   const renderBooks = () => {
     const books = [...current.context.books];
-    console.log(current.context, " current.context");
     const sortedBooks = books.reverse();
 
     const data = sortedBooks.map((book: any) => (
@@ -294,8 +289,6 @@ const Books: FC<BookProps> = ({ token }) => {
         </div>
       </>
     ));
-
-    console.log(data, " data");
 
     return data;
   };
