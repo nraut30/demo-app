@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC, useEffect } from "react";
 import "./Auth.css";
 import { createMachine, assign } from "xstate";
 import { useForm } from "react-hook-form";
@@ -29,6 +29,7 @@ const loginMachine = createMachine(
       userId: "",
       token: "",
       tokenExpiration: "",
+      signupSuccess: false,
     },
     states: {
       collectingFormData: {
@@ -43,11 +44,19 @@ const loginMachine = createMachine(
   {
     actions: {
       savedata: assign((_, evnt: any) => {
-        return {
-          userId: evnt.resData.data.login.userId,
-          token: evnt.resData.data.login.token,
-          tokenExpiration: evnt.resData.data.login.tokenExpiration,
-        };
+        if (!evnt.signupSuccess) {
+          return {
+            ..._,
+            userId: evnt.resData.data.login.userId,
+            token: evnt.resData.data.login.token,
+            tokenExpiration: evnt.resData.data.login.tokenExpiration,
+            signupSuccess: false,
+          };
+        } else {
+          return {
+            signupSuccess: evnt.signupSuccess,
+          };
+        }
       }),
     },
   }
@@ -104,13 +113,21 @@ const submitUser = async (args: {
         }
       })
       .then((resData) => {
-        if (resData.data.login) args.send("submit", { resData });
+        if (resData.data.login) {
+          args.send("submit", { resData });
+        } else {
+          args.send("submit", { signupSuccess: true });
+        }
       })
       .catch((err) => console.log(err, " error"));
   }
 };
 
-const Auth = () => {
+type AuthProps = {
+  context: CallableFunction;
+};
+
+const Auth: FC<AuthProps> = ({ context }) => {
   const form = useForm({
     defaultValues: {
       email: "",
@@ -120,6 +137,28 @@ const Auth = () => {
 
   const [currentTab, sendTab] = useMachine(toggleStateMachine);
   const [currentStat, sendStat] = useMachine(loginMachine);
+
+  useEffect(() => {
+    if (
+      currentStat.context.userId &&
+      currentStat.context.token &&
+      currentStat.context.tokenExpiration
+    ) {
+      context(currentStat.context);
+    }
+  }, [
+    currentStat.context.userId,
+    currentStat.context.token,
+    currentStat.context.tokenExpiration,
+  ]);
+
+  useEffect(() => {
+    if (currentStat.context.signupSuccess) {
+      window.alert("Signup successful");
+    } else if (currentStat.context.userId) {
+      window.alert("Signin succesful");
+    }
+  }, [currentStat.context.signupSuccess, currentStat.context.userId]);
 
   return (
     <>
@@ -181,7 +220,9 @@ const Auth = () => {
           )}
         </div>
         <div className="form-action">
-          <button>Submit</button>
+          <button>
+            {currentTab.matches("signin") ? " SignIn " : " SignUp "}
+          </button>
         </div>
       </form>
       <div className="tabSwitcher" onClick={() => sendTab("TOGGLE")}>

@@ -1,8 +1,12 @@
-import React from "react";
+import React, { FC } from "react";
 import { NavLink } from "react-router-dom";
 import "./Navbar.css";
 
-const Navbar = () => {
+type NavbarProps = {
+  showBooks: Boolean;
+};
+
+const Navbar: FC<NavbarProps> = ({ showBooks }) => {
   return (
     <header className="main-navigation">
       <div className="main-navigation_logo">
@@ -13,9 +17,11 @@ const Navbar = () => {
           <li>
             <NavLink to="/"> Authenticate </NavLink>
           </li>
-          <li>
-            <NavLink to="/books"> Books </NavLink>
-          </li>
+          {showBooks && (
+            <li>
+              <NavLink to="/books"> Books </NavLink>
+            </li>
+          )}
         </ul>
       </nav>
     </header>
