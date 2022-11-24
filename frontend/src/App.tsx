@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import Auth from "./pages/Auth";
 import Books from "./pages/Books";
 import Navbar from "./components/Navbar";
@@ -16,63 +16,62 @@ const initContext = {
   logoutUser: false,
 };
 
-const appMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QEMAOqCyyDGALAlgHZgB0ArocmQC65iHX7bLWQDEsyAbmAMID2DMAA9qAbQAMAXUShU-WPkaDZIYYgCcEkgFYJANgBMOgOzH9EgBwmJOgDQgAnogCMOjSX36ALDuMSNQwsNb28AXzCHNEwcAmISKlp6RmZWCA5cfgB3ACF+fgBrWEkZJBB5RWVCVXUEQ0MXXWsdAGYNH18JCRNvB2cEAFoPeu8NMZcrF0sdP0sIqPQsPCJSACN8orYAG34ofhoS1QqlfBUy2u82khbLk2mWqZd9QL7EQ0uSQxafGxbDEz0Fjm8xAhH4EDgqmiSziYCOChOZ1AtQGJn0JC0Rn0LlCNjGoVegw0lmulhcxh0lhCfm+LRB0NiK3IlBodAYTBYkHhlVO1XOiAGOhIZOs+haOm8lmxGhMOMJhmsnxMbR0Pj+DUMGnpi0Z8USbJSnIg3MRfORAoVGIMQRx3jxIUuhMsJPaos1XUsVk12piy3i60K8DKxyqNUQN0Mny6EgaJh6NjthJcGka-xVavq5K1ETCQA */
-  createMachine(
-    {
-      context: initContext,
-      id: "appMachine",
-      initial: "unauthenticated",
-      states: {
-        unauthenticated: {
-          on: {
-            saveContext: {
-              target: "authenticated",
-              actions: "saveContext",
-            },
+//app machine by xstate
+const appMachine = createMachine(
+  {
+    context: initContext,
+    id: "appMachine",
+    initial: "unauthenticated",
+    states: {
+      unauthenticated: {
+        on: {
+          saveContext: {
+            target: "authenticated",
+            actions: "saveContext",
           },
         },
-        authenticated: {
-          on: {
-            showBooks: {
-              actions: "showBooks",
-            },
-            logout: {
-              target: "unauthenticated",
-              actions: "logout",
-            },
+      },
+      authenticated: {
+        on: {
+          showBooks: {
+            actions: "showBooks",
+          },
+          logout: {
+            target: "unauthenticated",
+            actions: "logout",
           },
         },
       },
     },
-    {
-      actions: {
-        logout: assign((cntx, e) => {
-          return {
-            ...initContext,
-          };
-        }),
-        saveContext: assign((c, e: any) => {
-          return {
-            ...c,
-            userId: e.userId,
-            token: e.token,
-            tokenExpiration: e.tokenExpiration,
-            showBooks: true,
-          };
-        }),
-      },
-    }
-  );
+  },
+  {
+    actions: {
+      logout: assign((cntx, e) => {
+        return {
+          ...initContext,
+        };
+      }),
+      saveContext: assign((c, e: any) => {
+        return {
+          ...c,
+          userId: e.userId,
+          token: e.token,
+          tokenExpiration: e.tokenExpiration,
+          showBooks: true,
+        };
+      }),
+    },
+  }
+);
 
 function App() {
   const [current, send] = useMachine(appMachine);
 
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const contextHandler = (ctx: {
-    userId: String;
-    token: String;
-    tokenExpiration: String;
+    userId: string;
+    token: string;
+    tokenExpiration: string;
   }) => {
     if (ctx.userId && ctx.token && ctx.tokenExpiration) {
       send("saveContext", { ...ctx });

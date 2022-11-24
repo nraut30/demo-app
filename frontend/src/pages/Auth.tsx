@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useMachine } from "@xstate/react";
 import { send } from "xstate/lib/actions";
 
+//signIn and signUp toggle machine
 const toggleStateMachine = createMachine({
   id: "toggleStateMachine",
   initial: "signin",
@@ -22,9 +23,10 @@ const toggleStateMachine = createMachine({
   },
 });
 
-const loginMachine = createMachine(
+//auth machine
+const authMachine = createMachine(
   {
-    id: "login",
+    id: "auth",
     initial: "collectingFormData",
     context: {
       userId: "",
@@ -66,15 +68,6 @@ const loginMachine = createMachine(
           };
         }
       }),
-      // reset: assign((_, evnt: any) => {
-      //   return {
-      //     userId: "",
-      //     token: "",
-      //     tokenExpiration: "",
-      //     signupSuccess: false,
-      //     error: false,
-      //   };
-      // }),
       error: assign((_, evnt: any) => {
         return {
           ..._,
@@ -86,6 +79,7 @@ const loginMachine = createMachine(
   }
 );
 
+//submit formData
 const submitUser = async (args: {
   email: string;
   password: string;
@@ -168,7 +162,7 @@ const Auth: FC<AuthProps> = ({ context }) => {
   });
 
   const [currentTab, sendTab] = useMachine(toggleStateMachine);
-  const [currentStat, sendStat] = useMachine(loginMachine);
+  const [currentStat, sendStat] = useMachine(authMachine);
 
   useEffect(() => {
     if (
@@ -261,7 +255,13 @@ const Auth: FC<AuthProps> = ({ context }) => {
           </button>
         </div>
       </form>
-      <div className="tabSwitcher" onClick={() => sendTab("TOGGLE")}>
+      <div
+        className="tabSwitcher"
+        onClick={() => {
+          sendTab("TOGGLE");
+          form.reset();
+        }}
+      >
         <u>
           {currentTab.matches("signin")
             ? " or you can Signup "

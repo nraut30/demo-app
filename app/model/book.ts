@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 
 const Schema = mongoose.Schema
 
+//single book schema for mongoDB
 const bookSchema = new Schema({
   title: {
     type: String,

@@ -1,5 +1,6 @@
 import { buildSchema } from "graphql";
 
+//schema of graphQL
 const graphQLSchema = buildSchema(`
 type Book {
     _id: ID!

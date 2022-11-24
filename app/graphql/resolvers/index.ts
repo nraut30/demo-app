@@ -2,8 +2,10 @@ import Book from "../../model/book"
 import User from "../../model/user"
 import bcrypt from "bcryptjs";
 import jwt from 'jsonwebtoken';
+import { BookType } from "../types/Types";
 
-const user = async (userId: any): Promise<any> => {
+//user finder helper
+const user = async (userId: string): Promise<any> => {
     try {
         const user: any = await User.findById(userId)
         return { ...user._doc, _id: user.id, booksOwned: books.bind(this, ...user._doc.booksOwned) }
@@ -13,7 +15,8 @@ const user = async (userId: any): Promise<any> => {
     }
 }
 
-const books = async (booksId: any): Promise<any> => {
+//books finder helper
+const books = async (booksId: Array<string>): Promise<any> => {
     try {
         const books = await Book.find({ _id: { $in: booksId } })
         books.sort((a, b) => {
@@ -35,13 +38,15 @@ const books = async (booksId: any): Promise<any> => {
     }
 }
 
+//graphQL resolver
 const graphQLResolver = {
+    //books fetcher
     books: async (args: any, req: any) => {
         if (!req.isAuth) {
             throw new Error('Unauthenticated!');
         }
         try {
-            const books: any = await Book.find()
+            const books: Array<BookType> = await Book.find()
             return books.map((book: any) => {
                 return {
                     ...book._doc,
@@ -56,6 +61,8 @@ const graphQLResolver = {
             throw err
         }
     },
+
+    //create book
     createBook: async (args: any, req: any) => {
         if (!req.isAuth) {
             throw new Error('Unauthenticated!');
@@ -68,9 +75,8 @@ const graphQLResolver = {
                 date: new Date(args.bookInput.date),
                 owner: req.userId
             })
-            let createdBook: any;
             const result: any = await book.save();
-            createdBook = {
+            const createdBook = {
                 ...result._doc,
                 _id: result._doc._id.toString(),
                 owner: user.bind(this, result._doc.owner)
@@ -87,6 +93,8 @@ const graphQLResolver = {
             throw err
         }
     },
+
+    //create new user
     createUser: async (args: any) => {
         try {
             const userFound: any = await User.findOne({ email: args.userInput.email })
@@ -105,7 +113,9 @@ const graphQLResolver = {
             throw err
         }
     },
-    login: async ({ email, password }: { email: String, password: any }) => {
+
+    //login
+    login: async ({ email, password }: { email: string, password: any }) => {
         const user = await User.findOne({ email: email });
         if (!user) {
             throw new Error('User does not exist!');

@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 
 const Schema = mongoose.Schema
 
+//single user schema for mongoDB
 const userSchema = new Schema({
     email: {
         type: String,

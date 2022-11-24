@@ -10,8 +10,10 @@ const app = express()
 
 app.use(bodyParser.json())
 
+//isAuth middleware
 app.use(isAuth);
 
+//CORS allow and other Headers
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
@@ -23,6 +25,7 @@ app.use((req, res, next) => {
   }
 })
 
+//graphQL API with schema
 app.use(
   '/graphql',
   graphqlHTTP({
@@ -32,6 +35,7 @@ app.use(
   })
 )
 
+//mongoDB connection
 mongoose
   .connect(
     `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.b3mu90y.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`

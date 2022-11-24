@@ -1,6 +1,16 @@
-import React from "react";
+import React, { FC, ReactNode } from "react";
 import "./Modal.css";
-const Modal = (props: any) => {
+
+type ModalProps = {
+  title: string;
+  children: ReactNode;
+  canCancel: boolean;
+  onCancel: CallableFunction;
+  canConfirm: boolean;
+  onConfirm: CallableFunction;
+};
+
+const Modal: FC<ModalProps> = (props) => {
   return (
     <div className="modal">
       <header className="modal_header">{props.title}</header>

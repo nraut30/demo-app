@@ -4,123 +4,123 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { assign, createMachine } from "xstate";
 import Backdrop from "../components/backdrop/Backdrop";
+import Book from "../components/book/Book";
 import Modal from "../components/modals/Modal";
 import "./Books.css";
 
-const booksMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QCMD2qDWsB0sAWqA7gELpYDEqADmAHYCyqEAhgDYDaADALqKhWpYASwAuQ1LT4gAHogBMANgCc2ACzLOAZgCMnLQFYA7PtUAaEAE95nbAA45m1fserDtpatXaFAXx-m0TBxmCAhSTHJYZgA3MHCMLl4kEAFhMQkpWQRtfWwFOVtXJS1tVT1tJXMrBAcFbDlVB0M5fX1OMua-ALJg0PjyAGNmWgGwVgBlGLBEqVTRcUlkrIBaTRscuTd2zlsFXftNKsRNTRV7QwV9JUNVa8NOC79-EFomOClArFnBeYylxGW2haeRy2m0hiUClOnGURwQyz22BOBT0RnyDSMXRAnxw+CI8XgyTm6UWoCymkUSJhBUMmgUNyURjhci0IP0lz0jk2qixOOwITCZG+aQWmQBhkMbLBEKhxVhlkQjTyRlsOlVzkM2k0tiePiAA */
-  createMachine(
-    {
-      context: {
-        modalOpen: false,
-        addedBook: {},
-        books: [],
-        showSuccess: false,
-        showError: false,
+//books handling machine
+const booksMachine = createMachine(
+  {
+    context: {
+      modalOpen: false,
+      addedBook: {},
+      books: [],
+      showSuccess: false,
+      showError: false,
+    },
+    id: "books",
+    initial: "showBooks",
+    states: {
+      showBooks: {
+        on: {
+          openModal: {
+            target: "addBook",
+            actions: "openModal",
+          },
+          saveBooks: {
+            actions: ["saveBooks"],
+          },
+          reset: {
+            actions: ["reset"],
+          },
+        },
       },
-      id: "books",
-      initial: "showBooks",
-      states: {
-        showBooks: {
-          on: {
-            openModal: {
-              target: "addBook",
-              actions: "openModal",
-            },
-            saveBooks: {
-              actions: ["saveBooks"],
-            },
-            reset: {
-              actions: ["reset"],
-            },
+      addBook: {
+        on: {
+          saveBook: {
+            target: "saveBookInDB",
+            actions: ["saveBook"],
+          },
+          cancelSave: {
+            target: "showBooks",
+            actions: ["cancelSave"],
           },
         },
-        addBook: {
-          on: {
-            saveBook: {
-              target: "saveBookInDB",
-              actions: ["saveBook"],
-            },
-            cancelSave: {
-              target: "showBooks",
-              actions: ["cancelSave"],
-            },
+      },
+      saveBookInDB: {
+        invoke: {
+          src: "saveBookInDB",
+          onDone: {
+            target: "showBooks",
+            actions: ["showSuccess"],
           },
-        },
-        saveBookInDB: {
-          invoke: {
-            src: "saveBookInDB",
-            onDone: {
-              target: "showBooks",
-              actions: ["showSuccess"],
-            },
-            onError: {
-              actions: ["showError"],
-            },
+          onError: {
+            actions: ["showError"],
           },
         },
       },
     },
-    {
-      actions: {
-        openModal: assign((ct, e) => {
-          return {
-            ...ct,
-            modalOpen: true,
-          };
-        }),
-        saveBooks: assign((ct, e: any): any => {
-          return {
-            ...ct,
-            books: [...e.data.books],
-          };
-        }),
-        saveBook: assign((ct, e) => {
-          return {
-            ...ct,
-            addedBook: { ...e },
-            modalOpen: false,
-          };
-        }),
-        showSuccess: assign((c, e) => {
-          return {
-            ...c,
-            showSuccess: true,
-          };
-        }),
-        showError: assign((c, e) => {
-          return {
-            ...c,
-            showError: true,
-          };
-        }),
-        cancelSave: assign((ct, e) => {
-          return {
-            ...ct,
-            addedBook: {},
-            modalOpen: false,
-          };
-        }),
-        reset: assign((ct, e) => {
-          return {
-            ...ct,
-            showSuccess: false,
-            showError: false,
-          };
-        }),
-      },
-      services: {
-        saveBookInDB: (context, event): any => saveBookInDB(context.addedBook),
-      },
-    }
-  );
+  },
+  {
+    actions: {
+      openModal: assign((ct, e) => {
+        return {
+          ...ct,
+          modalOpen: true,
+        };
+      }),
+      saveBooks: assign((ct, e: any): any => {
+        return {
+          ...ct,
+          books: [...e.data.books],
+        };
+      }),
+      saveBook: assign((ct, e) => {
+        return {
+          ...ct,
+          addedBook: { ...e },
+          modalOpen: false,
+        };
+      }),
+      showSuccess: assign((c, e) => {
+        return {
+          ...c,
+          showSuccess: true,
+        };
+      }),
+      showError: assign((c, e) => {
+        return {
+          ...c,
+          showError: true,
+        };
+      }),
+      cancelSave: assign((ct, e) => {
+        return {
+          ...ct,
+          addedBook: {},
+          modalOpen: false,
+        };
+      }),
+      reset: assign((ct, e) => {
+        return {
+          ...ct,
+          showSuccess: false,
+          showError: false,
+        };
+      }),
+    },
+    services: {
+      saveBookInDB: (context, e): any => saveBookInDB(context.addedBook),
+    },
+  }
+);
 
-const fetchAllBooks = (token: String, send: any) => {
+//fetch all books service
+const fetchAllBooks = (token: string, send: any) => {
   if (!token) {
     console.error("token not found....");
   } else {
-    let reqBody;
-    reqBody = {
+    const reqBody = {
       query: `
     query {
       books {
@@ -158,11 +158,11 @@ const fetchAllBooks = (token: String, send: any) => {
   }
 };
 
+//save bookin DB service
 const saveBookInDB = (data: any) => {
   const token = data.token;
 
-  let reqBody;
-  reqBody = {
+  const reqBody = {
     query: `
     mutation {
       createBook(bookInput: {
@@ -197,12 +197,12 @@ const saveBookInDB = (data: any) => {
 };
 
 type BookProps = {
-  token: String;
+  token: string;
 };
 
 const Books: FC<BookProps> = ({ token }) => {
   const [current, send] = useMachine(booksMachine);
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (current.context.showSuccess) {
@@ -216,6 +216,7 @@ const Books: FC<BookProps> = ({ token }) => {
     }
   }, [current.context]);
 
+  //form hook
   const form = useForm({
     defaultValues: {
       title: "",
@@ -224,6 +225,7 @@ const Books: FC<BookProps> = ({ token }) => {
       description: "",
     },
   });
+
   const addBookHandler = () => {
     send("openModal");
   };
@@ -236,6 +238,7 @@ const Books: FC<BookProps> = ({ token }) => {
     fetchAllBooks(token, send);
   };
 
+  //add book handler
   const onConfirmHandler = (e: any) => {
     const title = form.getValues("title");
     const description = form.getValues("description");
@@ -263,30 +266,7 @@ const Books: FC<BookProps> = ({ token }) => {
 
     const data = sortedBooks.map((book: any) => (
       <>
-        <div key={book._id} className="book_wrapper">
-          <div className="title_price_date">
-            <div className="title">
-              Title - <span className="fetchedDataText">{book.title}</span>
-            </div>
-            <hr className="hrInDetail" />
-            <div>
-              <div>Price - Date</div>
-              <span className="fetchedDataText">
-                ${book.price} - {new Date(book.date).toLocaleDateString()}
-              </span>
-            </div>
-          </div>
-          <div className="description">
-            <div> Description</div>
-            <hr className="hrInDetail" />
-            <div>
-              <span className="fetchedDataText descriptiveText">
-                {" "}
-                {book.description}
-              </span>
-            </div>
-          </div>
-        </div>
+        <Book book={book} />
       </>
     ));
 

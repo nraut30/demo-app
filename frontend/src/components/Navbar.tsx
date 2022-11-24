@@ -1,13 +1,14 @@
 import React, { FC } from "react";
 import { NavLink } from "react-router-dom";
+import { BookProps } from "./book/Book";
 import "./Navbar.css";
 
 type NavbarProps = {
   contxt: {
-    userId: String;
-    token: String;
-    tokenExpiration: String;
-    books: Array<any>;
+    userId: string;
+    token: string;
+    tokenExpiration: string;
+    books: Array<BookProps>;
     showBooks: boolean;
     logoutUser: boolean;
   };

@@ -1,9 +1,11 @@
 import jwt from "jsonwebtoken";
 
-interface JwtPayload {
+//interface of JWT payload
+type JwtPayload = {
     userId: string
 }
 
+//isAuth middleware function
 const isAuth = (req: any, res: any, next: any) => {
     const authHeader = req.get('Authorization');
     if (!authHeader) {
