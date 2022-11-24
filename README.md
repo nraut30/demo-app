@@ -1,6 +1,6 @@
 # Chat App
 
-A BooStore app based on React(Typescript oriented using ViteJS), XState(State Management), ExpressJS(Server), NodeJS(Backend), MongoDB(Database) and graphQL.
+A BookStore app based on React(Typescript oriented using ViteJS), XState(State Management), ExpressJS(Server), NodeJS(Backend), MongoDB(Database) and graphQL.
 
 ## **To get it running locally**
 
@@ -78,21 +78,14 @@ You will get `DATABASE CONNECTED` once database is connected.
 
 run dev command in frontend directory in another terminal to run in developer's mode
 
-##### if you are in root directory
+#### if you are in root directory
 
 ```
 cd frontend/
 npm run dev
 ```
 
-Or you can preview the builded app
-
-```
-cd frontend/
-npm run preview
-```
-
-##### if you are in frontend directory
+if you are in frontend directory
 
 ```
 npm run dev
@@ -100,7 +93,14 @@ npm run dev
 
 and the development mode app can be accessed on http://localhost:5173/
 
-##### Or you can preview the builded app
+#### Or you can preview the builded app from root directory
+
+```
+cd frontend/
+npm run preview
+```
+
+Or you can preview the builded app from frontend directory directly
 
 ```
 npm run preview
@@ -108,6 +108,8 @@ npm run preview
 
 and the preview of app can be accessed on http://localhost:4173/
 <br>
+
+using node v19.1.0 (npm v8.19.3)
 
 ## Have a good experience
 
