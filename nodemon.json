@@ -1,7 +1,7 @@
 {
   "env": {
-    "MONGO_USER": "<your mongodb user name>",
-    "MONGO_PASSWORD": "<your mongodb password>",
-    "MONGO_DB": "<your mongodb database name>"
+    "MONGO_USER": "nraut",
+    "MONGO_PASSWORD": "123321",
+    "MONGO_DB": "books-react-dev"
   }
 }
