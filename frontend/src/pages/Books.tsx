@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { assign, createMachine } from "xstate";
 import Backdrop from "../components/backdrop/Backdrop";
 import Book from "../components/book/Book";
+import MessagePopUp from "../components/errorPopUp/MessagePopUp";
 import Modal from "../components/modals/Modal";
 import "./Books.css";
 
@@ -17,6 +18,7 @@ const booksMachine = createMachine(
       books: [],
       showSuccess: false,
       showError: false,
+      clear: true,
     },
     id: "books",
     initial: "showBooks",
@@ -28,10 +30,13 @@ const booksMachine = createMachine(
             actions: "openModal",
           },
           saveBooks: {
-            actions: ["saveBooks"],
+            actions: "saveBooks",
           },
           reset: {
-            actions: ["reset"],
+            actions: "reset",
+          },
+          clear: {
+            actions: ["clear"],
           },
         },
       },
@@ -39,24 +44,33 @@ const booksMachine = createMachine(
         on: {
           saveBook: {
             target: "saveBookInDB",
-            actions: ["saveBook"],
+            actions: "saveBook",
           },
           cancelSave: {
             target: "showBooks",
-            actions: ["cancelSave"],
+            actions: "cancelSave",
           },
         },
       },
       saveBookInDB: {
+        on: {
+          clear: {
+            actions: ["clear"],
+          },
+        },
         invoke: {
           src: "saveBookInDB",
-          onDone: {
-            target: "showBooks",
-            actions: ["showSuccess"],
-          },
-          onError: {
-            actions: ["showError"],
-          },
+          onDone: [
+            {
+              target: "showBooks",
+              actions: "showSuccess",
+            },
+          ],
+          onError: [
+            {
+              actions: "showError",
+            },
+          ],
         },
       },
     },
@@ -86,11 +100,13 @@ const booksMachine = createMachine(
         return {
           ...c,
           showSuccess: true,
+          clear: false,
         };
       }),
       showError: assign((c, e) => {
         return {
           ...c,
+          clear: false,
           showError: true,
         };
       }),
@@ -106,6 +122,12 @@ const booksMachine = createMachine(
           ...ct,
           showSuccess: false,
           showError: false,
+        };
+      }),
+      clear: assign((_, e) => {
+        return {
+          ..._,
+          clear: true,
         };
       }),
     },
@@ -204,18 +226,6 @@ const Books: FC<BookProps> = ({ token }) => {
   const [current, send] = useMachine(booksMachine);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (current.context.showSuccess) {
-      window.alert("Book saved successfully");
-      send("reset");
-      navigate("/books");
-    } else if (current.context.showError) {
-      window.alert("Unable to save book, retry.");
-      send("reset");
-      navigate("/books");
-    }
-  }, [current.context]);
-
   //form hook
   const form = useForm({
     defaultValues: {
@@ -273,8 +283,34 @@ const Books: FC<BookProps> = ({ token }) => {
     return data;
   };
 
+  const messageClearer = () => {
+    send("clear");
+    navigate("/books");
+  };
+
+  const renderMessagePopUp = () => {
+    if (current.context.showSuccess) {
+      return (
+        <MessagePopUp
+          message="Book saved successfully"
+          title="Message"
+          onConfirmHandler={messageClearer}
+        />
+      );
+    } else if (current.context.showError) {
+      return (
+        <MessagePopUp
+          message="Unable to save book, retry."
+          title="Error"
+          onConfirmHandler={messageClearer}
+        />
+      );
+    }
+  };
+
   return (
     <>
+      {!current.context.clear && renderMessagePopUp()}
       {current.context.modalOpen && (
         <>
           <Backdrop />

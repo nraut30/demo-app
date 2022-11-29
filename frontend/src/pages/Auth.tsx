@@ -4,6 +4,7 @@ import { createMachine, assign } from "xstate";
 import { useForm } from "react-hook-form";
 import { useMachine } from "@xstate/react";
 import { send } from "xstate/lib/actions";
+import MessagePopUp from "../components/errorPopUp/MessagePopUp";
 
 //signIn and signUp toggle machine
 const toggleStateMachine = createMachine({
@@ -34,6 +35,7 @@ const authMachine = createMachine(
       tokenExpiration: "",
       signupSuccess: false,
       error: false,
+      clear: true,
     },
     states: {
       collectingFormData: {
@@ -46,6 +48,9 @@ const authMachine = createMachine(
           },
           reset: {
             actions: ["reset"],
+          },
+          clear: {
+            actions: ["clear"],
           },
         },
       },
@@ -61,10 +66,12 @@ const authMachine = createMachine(
             token: evnt.resData.data.login.token,
             tokenExpiration: evnt.resData.data.login.tokenExpiration,
             signupSuccess: false,
+            clear: false,
           };
         } else {
           return {
             signupSuccess: evnt.signupSuccess,
+            clear: false,
           };
         }
       }),
@@ -73,7 +80,11 @@ const authMachine = createMachine(
           ..._,
           error: true,
           signupSuccess: false,
+          clear: false,
         };
+      }),
+      clear: assign((_, e) => {
+        return { ..._, clear: true };
       }),
     },
   }
@@ -178,18 +189,41 @@ const Auth: FC<AuthProps> = ({ context }) => {
     currentStat.context.tokenExpiration,
   ]);
 
-  useEffect(() => {
+  const messageClearer = () => {
+    sendStat("clear");
+  };
+
+  const renderMessagePopUp = () => {
     if (currentStat.context.signupSuccess) {
-      window.alert("Signup successful");
+      return (
+        <MessagePopUp
+          title="Message"
+          message="Signup successful"
+          onConfirmHandler={messageClearer}
+        />
+      );
     } else if (currentStat.context.userId) {
-      window.alert("Signin successful");
+      return (
+        <MessagePopUp
+          title="Message"
+          message="Signin successful"
+          onConfirmHandler={messageClearer}
+        />
+      );
     } else if (currentStat.context.error) {
-      window.alert("Error occurred");
+      return (
+        <MessagePopUp
+          title="Message"
+          message="Error occurred"
+          onConfirmHandler={messageClearer}
+        />
+      );
     }
-  }, [currentStat.context, currentStat.context]);
+  };
 
   return (
     <>
+      {!currentStat.context.clear && renderMessagePopUp()}
       <div className="headAuth">
         {currentTab.matches("signin") ? "Sign-In" : "Sign-Up"}
       </div>
