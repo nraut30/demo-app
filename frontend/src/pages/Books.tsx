@@ -342,7 +342,7 @@ const Books: FC<BookProps> = ({ token }) => {
                   {...form.register("price", {
                     validate: (value: string): any => {
                       if (value.length < 1) {
-                        return "Enter a valid email.";
+                        return "Enter a valid price.";
                       }
                     },
                   })}
@@ -356,7 +356,7 @@ const Books: FC<BookProps> = ({ token }) => {
                   {...form.register("date", {
                     validate: (value: string): any => {
                       if (value.length < 1) {
-                        return "Enter a valid email.";
+                        return "Enter a valid date.";
                       }
                     },
                   })}
@@ -365,12 +365,12 @@ const Books: FC<BookProps> = ({ token }) => {
                 />
               </div>
               <div className="form-control">
-                <label htmlFor="description">description</label>
+                <label htmlFor="description">Description</label>
                 <textarea
                   {...form.register("description", {
                     validate: (value: string): any => {
                       if (value.length < 1) {
-                        return "Enter a valid email.";
+                        return "Enter a valid description.";
                       }
                     },
                   })}
