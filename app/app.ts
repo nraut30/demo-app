@@ -38,7 +38,7 @@ app.use(
 //mongoDB connection
 mongoose
   .connect(
-    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.b3mu90y.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`
+    `mongodb+srv://nraut:123321@cluster0.b3mu90y.mongodb.net/books-react-dev?retryWrites=true&w=majority`
   )
   .then(() => {
     console.log('DATABASE CONNECTED')
